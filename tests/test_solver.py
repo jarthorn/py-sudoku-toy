@@ -1,4 +1,5 @@
 import unittest
+from src.board import Board
 from src.solver import SudokuSolver
 
 class TestSudokuSolver(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestSudokuSolver(unittest.TestCase):
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
-        self.solver = SudokuSolver(puzzle)
+        self.solver = SudokuSolver(Board(puzzle))
         self.solver.solve()
         self.assertTrue(self.solver.is_solved())
 
@@ -31,7 +32,7 @@ class TestSudokuSolver(unittest.TestCase):
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
-        self.solver = SudokuSolver(puzzle)
+        self.solver = SudokuSolver(Board(puzzle))
         self.solver.solve()
         self.assertFalse(self.solver.is_solved())
 
