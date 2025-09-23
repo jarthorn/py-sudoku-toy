@@ -57,3 +57,18 @@ class Board:
                     return False
 
         return True
+
+    def __str__(self):
+        lines = []
+        sep = "+-------+-------+-------+"
+        for i, row in enumerate(self.board):
+            if i % 3 == 0:
+                lines.append(sep)
+            line = "|"
+            for j, num in enumerate(row):
+                line += " " + (str(num) if num != 0 else ".")
+                if j % 3 == 2:
+                    line += " |"
+            lines.append(line)
+        lines.append(sep)
+        return "\n".join(lines)

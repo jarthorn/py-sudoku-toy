@@ -16,7 +16,8 @@ class TestSudokuSolver(unittest.TestCase):
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
-        self.solver = SudokuSolver(Board(puzzle))
+        board = Board(puzzle)
+        self.solver = SudokuSolver(board)
         self.solver.solve()
         self.assertTrue(self.solver.is_solved())
 
