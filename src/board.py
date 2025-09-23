@@ -3,6 +3,12 @@ class Board:
         import copy
         self.board = copy.deepcopy(board)
 
+    def get_row(self, row):
+        return list(self.board[row])
+
+    def get_col(self, col):
+        return [self.board[r][col] for r in range(9)]
+
     def get_cell(self, row, col):
         return self.board[row][col]
 

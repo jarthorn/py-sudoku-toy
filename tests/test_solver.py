@@ -35,6 +35,8 @@ class TestSolverSuite(unittest.TestCase):
             board = Board(self.easy_puzzle)
             solver = SolverClass(board)
             solver.solve()
+            if not board.is_solved():
+                print(board)
             self.assertTrue(board.is_solved(), f"{SolverClass.__name__} failed to solve easy puzzle")
 
     def test_unsolvable_puzzle(self):
