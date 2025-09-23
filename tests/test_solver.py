@@ -1,11 +1,12 @@
 
 import unittest
 from src.board import Board
-from src.solver import NaiveSolver
+from src.candidate_solver import CandidateSolver
+from src.naive_solver import NaiveSolver
 
 class TestSolverSuite(unittest.TestCase):
     def setUp(self):
-        self.solver_classes = [NaiveSolver]
+        self.solver_classes = [NaiveSolver, CandidateSolver]
         self.easy_puzzle = [
             [5, 3, 0, 0, 7, 0, 0, 0, 0],
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -34,14 +35,14 @@ class TestSolverSuite(unittest.TestCase):
             board = Board(self.easy_puzzle)
             solver = SolverClass(board)
             solver.solve()
-            self.assertTrue(solver.is_solved(), f"{SolverClass.__name__} failed to solve easy puzzle")
+            self.assertTrue(board.is_solved(), f"{SolverClass.__name__} failed to solve easy puzzle")
 
     def test_unsolvable_puzzle(self):
         for SolverClass in self.solver_classes:
             board = Board(self.unsolvable_puzzle)
             solver = SolverClass(board)
             solver.solve()
-            self.assertFalse(solver.is_solved(), f"{SolverClass.__name__} incorrectly solved unsolvable puzzle")
+            self.assertFalse(board.is_solved(), f"{SolverClass.__name__} incorrectly solved unsolvable puzzle")
 
 if __name__ == '__main__':
     unittest.main()
