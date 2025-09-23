@@ -25,12 +25,60 @@ class CandidateSolver:
 
     def heuristics(self):
         # List of heuristic methods to apply
-        return [self.eliminate_by_row, self.eliminate_by_col, self.eliminate_by_box]
+        return [
+            self.eliminate_by_row,
+            self.eliminate_by_col,
+            self.eliminate_by_box,
+            self.only_candidate_by_row,
+            self.only_candidate_by_col,
+            self.only_candidate_by_box
+        ]
+
+    def only_candidate_by_row(self):
+        changed = False
+        for r in range(9):
+            for digit in "123456789":
+                candidate_cells = [(r,c) for c in range(9) if digit in self.candidates[r][c]]
+                if self._update_only_candidate(candidate_cells, digit):
+                    changed = True
+        return changed
+
+    def _update_only_candidate(self, candidate_cells, digit):
+        if len(candidate_cells) == 1 and self.board.get_cell(*candidate_cells[0]) == 0:
+            (r,c) = candidate_cells[0]
+            self.candidates[r][c] = digit
+            self.board.set_cell(r, c, int(digit))
+            return True
+        return False
+
+    def only_candidate_by_col(self):
+        changed = False
+        for c in range(9):
+            for digit in "123456789":
+                candidate_cells = [(r, c) for r in range(9) if digit in self.candidates[r][c]]
+                if self._update_only_candidate(candidate_cells, digit):
+                    changed = True
+        return changed
+
+    def only_candidate_by_box(self):
+        changed = False
+        for box_row in range(0, 9, 3):
+            for box_col in range(0, 9, 3):
+                for digit in "123456789":
+                    candidate_cells = [
+                        (r, c)
+                        for r in range(box_row, box_row + 3)
+                        for c in range(box_col, box_col + 3)
+                        if digit in self.candidates[r][c]
+                    ]
+                    if (self._update_only_candidate(candidate_cells, digit)):
+                        changed = True
+        return changed
 
     def eliminate_by_row(self):
         changed = False
         for r in range(9):
-            solved = [str(x) for x in self.board.get_row(r) if x != 0]
+            solved = [str(value) for value in self.board.get_row(r) if value != 0]
             cells = [(r, c) for c in range(9)]
             if self._eliminate_candidates(cells, solved):
                 changed = True
@@ -39,7 +87,7 @@ class CandidateSolver:
     def eliminate_by_col(self):
         changed = False
         for c in range(9):
-            solved = [str(val) for val in self.board.get_col(c) if val != 0]
+            solved = [str(value) for value in self.board.get_col(c) if value != 0]
             cells = [(r, c) for r in range(9)]
             if self._eliminate_candidates(cells, solved):
                 changed = True
