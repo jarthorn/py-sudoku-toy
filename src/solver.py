@@ -1,6 +1,6 @@
 from src.board import Board
 
-class SudokuSolver:
+class NaiveSolver:
     def __init__(self, board):
         self.board = board
 

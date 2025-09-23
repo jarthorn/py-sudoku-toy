@@ -1,6 +1,7 @@
 class Board:
     def __init__(self, board):
-        self.board = board
+        import copy
+        self.board = copy.deepcopy(board)
 
     def get_cell(self, row, col):
         return self.board[row][col]

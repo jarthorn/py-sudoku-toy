@@ -1,11 +1,12 @@
+
 import unittest
 from src.board import Board
-from src.solver import SudokuSolver
+from src.solver import NaiveSolver
 
-class TestSudokuSolver(unittest.TestCase):
-
-    def test_solve_easy_puzzle(self):
-        puzzle = [
+class TestSolverSuite(unittest.TestCase):
+    def setUp(self):
+        self.solver_classes = [NaiveSolver]
+        self.easy_puzzle = [
             [5, 3, 0, 0, 7, 0, 0, 0, 0],
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
             [0, 9, 8, 0, 0, 0, 0, 6, 0],
@@ -16,13 +17,7 @@ class TestSudokuSolver(unittest.TestCase):
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
-        board = Board(puzzle)
-        self.solver = SudokuSolver(board)
-        self.solver.solve()
-        self.assertTrue(self.solver.is_solved())
-
-    def test_unsolvable_puzzle(self):
-        puzzle = [
+        self.unsolvable_puzzle = [
             [5, 5, 0, 0, 7, 0, 0, 0, 0],  # Invalid: two 5's in the first row
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
             [0, 9, 8, 0, 0, 0, 0, 6, 0],
@@ -33,9 +28,20 @@ class TestSudokuSolver(unittest.TestCase):
             [0, 0, 0, 4, 1, 9, 0, 0, 5],
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
-        self.solver = SudokuSolver(Board(puzzle))
-        self.solver.solve()
-        self.assertFalse(self.solver.is_solved())
+
+    def test_solve_easy_puzzle(self):
+        for SolverClass in self.solver_classes:
+            board = Board(self.easy_puzzle)
+            solver = SolverClass(board)
+            solver.solve()
+            self.assertTrue(solver.is_solved(), f"{SolverClass.__name__} failed to solve easy puzzle")
+
+    def test_unsolvable_puzzle(self):
+        for SolverClass in self.solver_classes:
+            board = Board(self.unsolvable_puzzle)
+            solver = SolverClass(board)
+            solver.solve()
+            self.assertFalse(solver.is_solved(), f"{SolverClass.__name__} incorrectly solved unsolvable puzzle")
 
 if __name__ == '__main__':
     unittest.main()
