@@ -4,10 +4,12 @@ class CandidateSolver:
         # Candidates: 9x9 grid of strings, each string contains possible digits for that cell
         self.candidates = [["123456789" if self.board.get_cell(r, c) == 0 else str(self.board.get_cell(r, c))
                             for c in range(9)] for r in range(9)]
+        self.attempts = 0
 
     def solve(self):
         changed = True
         while changed:
+            self.attempts += 1
             if self.board.is_solved():
                 break
             changed = False
@@ -79,3 +81,6 @@ class CandidateSolver:
                                 if len(self.candidates[r][c]) == 1:
                                     self.board.set_cell(r, c, int(self.candidates[r][c]))
         return changed
+    @property
+    def attempt_count(self):
+        return self.attempts

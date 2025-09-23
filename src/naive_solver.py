@@ -3,8 +3,10 @@ from src.board import Board
 class NaiveSolver:
     def __init__(self, board):
         self.board = board
+        self.attempts = 0
 
     def solve(self):
+        self.attempts += 1
         empty = self.board.find_empty()
         if not empty:
             return True  # Solved
@@ -21,5 +23,6 @@ class NaiveSolver:
 
         return False  # Trigger backtracking
 
-    def is_solved(self):
-        return self.board.is_solved()
+    @property
+    def attempt_count(self):
+        return self.attempts
