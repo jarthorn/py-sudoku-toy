@@ -1,2 +1,2 @@
 #!/bin/bash
-PYTHONPATH=. python3 solver.py
+PYTHONPATH=. python3 src/solver.py
