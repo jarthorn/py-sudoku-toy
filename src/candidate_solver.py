@@ -1,5 +1,17 @@
 class CandidateSolver:
 
+    def __str__(self):
+        lines = []
+        for r in range(9):
+            row = []
+            for c in range(9):
+                cell = self.candidates[r][c]
+                row.append(cell.center(9))
+            lines.append(" | ".join(row))
+            if r % 3 == 2 and r != 8:
+                lines.append("-" * (9 * 10 - 1))
+        return "\n".join(lines)
+
     def __init__(self, board):
         self.board = board
         # Candidates: 9x9 grid of strings, each string contains possible digits for that cell

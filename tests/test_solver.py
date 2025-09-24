@@ -41,6 +41,17 @@ class TestSolverSuite(unittest.TestCase):
             [0, 0, 0, 0, 8, 0, 0, 7, 9]
         ]
         self.hard_puzzle = [
+            [0, 8, 0, 5, 3, 0, 4, 1, 0],
+            [5, 0, 0, 0, 0, 0, 0, 3, 0],
+            [0, 0, 0, 7, 0, 0, 0, 0, 0],
+            [0, 0, 6, 0, 0, 2, 7, 0, 9],
+            [0, 0, 0, 0, 8, 0, 0, 0, 0],
+            [8, 0, 2, 1, 0, 0, 6, 0, 0],
+            [0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 7, 0, 0, 0, 0, 0, 0, 3],
+            [0, 4, 3, 0, 9, 7, 0, 5, 0]
+        ]
+        self.extreme_puzzle = [
             [8, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 3, 6, 0, 0, 0, 0, 0],
             [0, 7, 0, 0, 9, 0, 2, 0, 0],
@@ -68,7 +79,7 @@ class TestSolverSuite(unittest.TestCase):
             solver.solve()
             if not board.is_solved():
                 print(f"{SolverClass.__name__} failed to solve medium puzzle:")
-            print(board)
+                print(board)
             self.assertTrue(board.is_solved(), f"{SolverClass.__name__} failed to solve medium puzzle")
 
     def test_solve_hard_puzzle(self):
@@ -79,7 +90,7 @@ class TestSolverSuite(unittest.TestCase):
             # print(f"{SolverClass.__name__} attempts: {solver.attempt_count}")
             if not board.is_solved():
                 print(f"{SolverClass.__name__} failed to solve hard puzzle:")
-                print(board)
+                print(solver)
             self.assertTrue(board.is_solved(), f"{SolverClass.__name__} failed to solve hard puzzle")
 
     def test_unsolvable_puzzle(self):
