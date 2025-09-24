@@ -1,5 +1,4 @@
 class CandidateSolver:
-
     def __str__(self):
         lines = []
         for r in range(9):
@@ -43,7 +42,10 @@ class CandidateSolver:
             self.eliminate_by_box,
             self.only_candidate_by_row,
             self.only_candidate_by_col,
-            self.only_candidate_by_box
+            self.only_candidate_by_box,
+            self.subsets_by_row,
+            self.subsets_by_col,
+            self.subsets_by_box
         ]
 
     def only_candidate_by_row(self):
@@ -116,9 +118,54 @@ class CandidateSolver:
                     changed = True
         return changed
 
+    def subsets_by_row(self):
+        changed = False
+        for r in range(9):
+            # Collect all unique candidate strings of length 2-4 in the row
+            row_candidates = [self.candidates[r][c] for c in range(9) if 1 < len(self.candidates[r][c]) <= 4]
+            for cand in set(row_candidates):
+                subset_coordinates = self._find_subsets(cand, [(r, c) for c in range(9)])
+                if len(subset_coordinates) == len(cand):
+                    # Eliminate these digits from all other cells in the row using _eliminate_candidates
+                    non_subset_cells = [(r, c) for c in range(9) if (r, c) not in subset_coordinates]
+                    if self._eliminate_candidates(non_subset_cells, cand):
+                        changed = True
+        return changed
+
+    def subsets_by_col(self):
+        changed = False
+        for c in range(9):
+            # Collect all unique candidate strings of length 2-4 in the column
+            col_candidates = [self.candidates[r][c] for r in range(9) if 1 < len(self.candidates[r][c]) <= 4]
+            for cand in set(col_candidates):
+                subset_coordinates = self._find_subsets(cand, [(r, c) for r in range(9)])
+                if len(subset_coordinates) == len(cand):
+                    # Eliminate these digits from all other cells in the column using _eliminate_candidates
+                    non_subset_cells = [(r, c) for r in range(9) if (r, c) not in subset_coordinates]
+                    if self._eliminate_candidates(non_subset_cells, cand):
+                        changed = True
+        return changed
+
+    def subsets_by_box(self):
+        changed = False
+        for box_row in range(0, 9, 3):
+            for box_col in range(0, 9, 3):
+                # Collect all unique candidate strings of length 2-4 in the box
+                box_cells = [(r, c) for r in range(box_row, box_row + 3) for c in range(box_col, box_col + 3)]
+                box_candidates = [self.candidates[r][c] for (r, c) in box_cells if 1 < len(self.candidates[r][c]) <= 4]
+                for cand in set(box_candidates):
+                    subset_coordinates = self._find_subsets(cand, box_cells)
+                    if len(subset_coordinates) == len(cand):
+                        # Eliminate these digits from all other cells in the box using _eliminate_candidates
+                        non_subset_cells = [cell for cell in box_cells if cell not in subset_coordinates]
+                        if self._eliminate_candidates(non_subset_cells, cand):
+                            changed = True
+        return changed
+
     def _eliminate_candidates(self, cells, solved):
         """
         Helper to remove solved values from candidate strings in given cells.
+
         cells: iterable of (row, col) tuples
         solved: iterable of string digits to remove
         Returns True if any candidate was changed.
@@ -134,3 +181,18 @@ class CandidateSolver:
                     if len(self.candidates[r][c]) == 1:
                         self.board.set_cell(r, c, int(self.candidates[r][c]))
         return changed
+
+    def _find_subsets(self, search, targets):
+        """
+        Returns the coordinates in targets that have a subset of the digits in search.
+        search: string of digits to find subsets of
+        targets: array of tuples (row, col) representing candidate cells to find subsets in
+        Returns array of tuples (row, col) from targets that match the criteria
+        """
+        search_set = set(search)
+        result = []
+        for (r, c) in targets:
+            s_set = set(self.candidates[r][c])
+            if s_set <= search_set:
+                result.append((r, c))
+        return result
