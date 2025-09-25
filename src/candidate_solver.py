@@ -45,7 +45,8 @@ class CandidateSolver:
             self.only_candidate_by_box,
             self.subsets_by_row,
             self.subsets_by_col,
-            self.subsets_by_box
+            self.subsets_by_box,
+            self.aligned_by_box
         ]
 
     def only_candidate_by_row(self):
@@ -159,6 +160,33 @@ class CandidateSolver:
                         # Eliminate these digits from all other cells in the box using _eliminate_candidates
                         non_subset_cells = [cell for cell in box_cells if cell not in subset_coordinates]
                         if self._eliminate_candidates(non_subset_cells, cand):
+                            changed = True
+        return changed
+
+    def aligned_by_box(self):
+        changed = False
+        # for each 3x3 box
+        for box_row in range(0, 9, 3):
+            for box_col in range(0, 9, 3):
+                box_cells = [(r, c) for r in range(box_row, box_row + 3) for c in range(box_col, box_col + 3)]
+                for digit in "123456789":
+                    candidate_cells = [(r, c) for (r, c) in box_cells if digit in self.candidates[r][c]]
+                    if len(candidate_cells) <= 1:
+                        continue
+                    # Check if all candidate cells are in the same row or column
+                    rows = set(r for r, _ in candidate_cells)
+                    cols = set(c for _, c in candidate_cells)
+                    # if len(rows) == 1:
+                    #     row = rows.pop()
+                    #     # Eliminate digit from other cells in the row outside the box
+                    #     non_box_cells = [(row, c) for c in range(9) if not (box_col <= c < box_col + 3)]
+                    #     if self._eliminate_candidates(non_box_cells, digit):
+                    #         changed = True
+                    if len(cols) == 1:
+                        col = cols.pop()
+                        # Eliminate digit from other cells in the column outside the box
+                        non_box_cells = [(r, col) for r in range(9) if not (box_row <= r < box_row + 3)]
+                        if self._eliminate_candidates(non_box_cells, digit):
                             changed = True
         return changed
 
