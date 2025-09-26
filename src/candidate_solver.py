@@ -52,11 +52,22 @@ class CandidateSolver:
     def only_candidate_by_row(self):
         changed = False
         for r in range(9):
-            for digit in "123456789":
-                candidate_cells = [(r,c) for c in range(9) if digit in self.candidates[r][c]]
-                if self._update_only_candidate(candidate_cells, digit):
-                    changed = True
+            region_candidates = self._row_candidates(r)
+            if self.__update_only_candidate(region_candidates):
+                changed = True
         return changed
+
+    def _row_candidates(self, row):
+        return [(row, c) for c in range(9)]
+
+    def _col_candidates(self, col):
+        return [(r, col) for r in range(9)]
+
+    def _box_candidates(self, box_row, box_col):
+        return [(r, c) for r in range(box_row, box_row + 3) for c in range(box_col, box_col + 3)]
+
+    def _boxes(self):
+        return [(box_row, box_col) for box_row in range(0, 9, 3) for box_col in range(0, 9, 3)]
 
     def _update_only_candidate(self, candidate_cells, digit):
         if len(candidate_cells) == 1 and self.board.get_cell(*candidate_cells[0]) == 0:
@@ -69,25 +80,27 @@ class CandidateSolver:
     def only_candidate_by_col(self):
         changed = False
         for c in range(9):
-            for digit in "123456789":
-                candidate_cells = [(r, c) for r in range(9) if digit in self.candidates[r][c]]
-                if self._update_only_candidate(candidate_cells, digit):
-                    changed = True
+            region_candidates = self._col_candidates(c)
+            if self.__update_only_candidate(region_candidates):
+                changed = True
         return changed
 
     def only_candidate_by_box(self):
         changed = False
-        for box_row in range(0, 9, 3):
-            for box_col in range(0, 9, 3):
-                for digit in "123456789":
-                    candidate_cells = [
-                        (r, c)
-                        for r in range(box_row, box_row + 3)
-                        for c in range(box_col, box_col + 3)
-                        if digit in self.candidates[r][c]
-                    ]
-                    if (self._update_only_candidate(candidate_cells, digit)):
-                        changed = True
+        for (box_row, box_col) in self._boxes():
+            region_candidates = self._box_candidates(box_row, box_col)
+            if self.__update_only_candidate(region_candidates):
+                changed = True
+        return changed
+    def __update_only_candidate(self, region_candidates):
+        changed = False
+        for digit in "123456789":
+            candidate_cells = [cell for cell in region_candidates if digit in self.candidates[cell[0]][cell[1]]]
+            if len(candidate_cells) == 1 and self.board.get_cell(*candidate_cells[0]) == 0:
+                r, c = candidate_cells[0]
+                self.candidates[r][c] = digit
+                self.board.set_cell(r, c, int(digit))
+                changed = True
         return changed
 
     def eliminate_by_row(self):
@@ -192,7 +205,8 @@ class CandidateSolver:
 
     def _eliminate_candidates(self, cells, solved):
         """
-        Helper to remove solved values from candidate strings in given cells.
+        Helper to remove solved values from candidate strings in given cells. Maintains the invariant that
+        the board state is always updated when the candidate string is reduced to a single value.
 
         cells: iterable of (row, col) tuples
         solved: iterable of string digits to remove
