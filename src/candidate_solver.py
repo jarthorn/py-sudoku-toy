@@ -52,18 +52,20 @@ class CandidateSolver:
     def only_candidate_by_row(self):
         changed = False
         for r in range(9):
-            region_candidates = self._row_candidates(r)
-            if self.__update_only_candidate(region_candidates):
+            region_cells = self._row_cells(r)
+            if self.__update_only_candidate(region_cells):
                 changed = True
         return changed
 
-    def _row_candidates(self, row):
+    def _row_cells(self, row):
         return [(row, c) for c in range(9)]
 
-    def _col_candidates(self, col):
+
+    def _col_cells(self, col):
         return [(r, col) for r in range(9)]
 
-    def _box_candidates(self, box_row, box_col):
+
+    def _box_cells(self, box_row, box_col):
         return [(r, c) for r in range(box_row, box_row + 3) for c in range(box_col, box_col + 3)]
 
     def _boxes(self):
@@ -80,16 +82,16 @@ class CandidateSolver:
     def only_candidate_by_col(self):
         changed = False
         for c in range(9):
-            region_candidates = self._col_candidates(c)
-            if self.__update_only_candidate(region_candidates):
+            region_cells = self._col_cells(c)
+            if self.__update_only_candidate(region_cells):
                 changed = True
         return changed
 
     def only_candidate_by_box(self):
         changed = False
         for (box_row, box_col) in self._boxes():
-            region_candidates = self._box_candidates(box_row, box_col)
-            if self.__update_only_candidate(region_candidates):
+            region_cells = self._box_cells(box_row, box_col)
+            if self.__update_only_candidate(region_cells):
                 changed = True
         return changed
     def __update_only_candidate(self, region_candidates):
@@ -107,8 +109,7 @@ class CandidateSolver:
         changed = False
         for r in range(9):
             solved = [str(value) for value in self.board.get_row(r) if value != 0]
-            cells = [(r, c) for c in range(9)]
-            if self._eliminate_candidates(cells, solved):
+            if self._eliminate_candidates(self._row_cells(r), solved):
                 changed = True
         return changed
 
@@ -116,32 +117,30 @@ class CandidateSolver:
         changed = False
         for c in range(9):
             solved = [str(value) for value in self.board.get_col(c) if value != 0]
-            cells = [(r, c) for r in range(9)]
-            if self._eliminate_candidates(cells, solved):
+            if self._eliminate_candidates(self._col_cells(c), solved):
                 changed = True
         return changed
 
     def eliminate_by_box(self):
         changed = False
-        for box_row in range(0, 9, 3):
-            for box_col in range(0, 9, 3):
-                solved = [str(self.board.get_cell(r, c)) for r in range(box_row, box_row + 3)
-                          for c in range(box_col, box_col + 3) if self.board.get_cell(r, c) != 0]
-                cells = [(r, c) for r in range(box_row, box_row + 3) for c in range(box_col, box_col + 3)]
-                if self._eliminate_candidates(cells, solved):
-                    changed = True
+        for (box_row, box_col) in self._boxes():
+            box_cells = self._box_cells(box_row, box_col)
+            solved = [str(self.board.get_cell(r, c)) for (r, c) in box_cells if self.board.get_cell(r, c) != 0]
+            if self._eliminate_candidates(box_cells, solved):
+                changed = True
         return changed
 
     def subsets_by_row(self):
         changed = False
         for r in range(9):
             # Collect all unique candidate strings of length 2-4 in the row
-            row_candidates = [self.candidates[r][c] for c in range(9) if 1 < len(self.candidates[r][c]) <= 4]
+            row_cells = self._row_cells(r)
+            row_candidates = [self.candidates[r][c] for (r,c) in row_cells if 1 < len(self.candidates[r][c]) <= 4]
             for cand in set(row_candidates):
-                subset_coordinates = self._find_subsets(cand, [(r, c) for c in range(9)])
+                subset_coordinates = self._find_subsets(cand, row_cells)
                 if len(subset_coordinates) == len(cand):
                     # Eliminate these digits from all other cells in the row using _eliminate_candidates
-                    non_subset_cells = [(r, c) for c in range(9) if (r, c) not in subset_coordinates]
+                    non_subset_cells = [(r, c) for (r, c) in row_cells if (r, c) not in subset_coordinates]
                     if self._eliminate_candidates(non_subset_cells, cand):
                         changed = True
         return changed
